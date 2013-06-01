@@ -20,8 +20,6 @@ public class JMXConsole {
             throws IOException, MalformedObjectNameException, InstanceNotFoundException,
             MBeanException, AttributeNotFoundException, ReflectionException, InvalidAttributeValueException {
 
-        //String host = "localhost";  // or some A.B.C.D
-        //int port = 1617;
         String url = "service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jmxrmi";
         JMXServiceURL serviceUrl = new JMXServiceURL(url);
         JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, null);
@@ -34,8 +32,8 @@ public class JMXConsole {
             } else {
                 for(String s : attributeName.split(",")) {
                     Object v = mbeanConn.getAttribute(new ObjectName(objectName), s);
-                    System.out.println( String.format("Attribute %s has value %s",
-                            s, v != null ? v.toString() : "NULL") );
+                    System.out.println( String.format("[%s:%d] Attribute %s has value %s\n",
+                            host, port, s, v != null ? v.toString() : "NULL") );
                 }
             }
         } finally {
@@ -44,24 +42,32 @@ public class JMXConsole {
 
     }
 
-    /** ObjectName attributeName [new_value_if_set] [host port ...]
-     * i.e.
-     * read all attributes: java jmxsample.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed,CurrentSpeed localhost 1617
-     * set new MaxSpeed: java jmxsample.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed i250 localhost 1617
+    /**
+     * first argument - path to text file w/ commands
+     * seconds argument - {1|0} continue or stop on errors, continue by default
+     * Read batch command from file, all command will be executed one by one
+     * ObjectName attributeName [new_value_if_set] [host port ...]
      * */
     public static void main(String argv[])
             throws Exception {
         JMXConsole console = new JMXConsole();
 
-        if(argv.length == 1)
-            argv = console.readFromFile(argv[0]);
+        boolean breakOnFail = false;
+        if(argv.length == 2)
+            breakOnFail = argv[1].equals("0");
 
-        for(int i = argv.length % 2 == 0 ? 2 : 3; i < argv.length; i += 2) {
+        List<String> commands = console.readFromFile(argv[0]);
+
+        for(String command : commands) {
+            String[] arguments = command.split("\\s");
             try {
-                console.run(argv.length % 2 == 1, argv[0], argv[1],
-                    argv.length % 2 == 1 ? argv[2] : null, argv[i], Integer.parseInt(argv[i+1]));
+                console.run(arguments.length % 2 == 1, arguments[0], arguments[1],
+                        arguments.length % 2 == 1 ? arguments[2] : null,
+                        arguments[arguments.length-2], Integer.parseInt(arguments[arguments.length-1]));
             } catch (Exception e) {
-                System.err.println(String.format("Can't perform operation on %s:%s", argv[i], argv[i + 1]));
+                System.err.println(String.format("Can't perform command %s\n",
+                        command));
+                if( breakOnFail ) System.exit(-1);
             }
         }
     }
@@ -87,15 +93,23 @@ public class JMXConsole {
         }
     }
 
-    private String[] readFromFile(String pathToFile) throws IOException {
+    /**
+     * One list is a completed JMX command:
+     * ObjectName attributeName [new_value_if_set] [host port ...]
+     * i.e.
+     * read all attributes: java jmxsample.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed,CurrentSpeed localhost 1617
+     * set new MaxSpeed: java jmxsample.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed i250 localhost 1617
+     */
+    private List<String> readFromFile(String pathToFile) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(pathToFile));
         List<String> list = new ArrayList<String>();
         String line = null;
         while ((line = br.readLine()) != null) {
-            list.addAll(Arrays.asList(line.split("\\s") ) );
+            if(!line.startsWith("#") && line.length() > 0)
+                list.add(line);
         }
         br.close();
 
-        return list.toArray(new String[list.size()]);
+        return list;
     }
 }

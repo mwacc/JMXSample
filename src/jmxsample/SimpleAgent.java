@@ -23,6 +23,11 @@ public class SimpleAgent {
 
     }
 
+    /**
+     * Run with:
+     * -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1617
+     * -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+     */
     public static void main(String argv[]) throws Exception {
         SimpleAgent agent = new SimpleAgent();
         System.out.println("jmxsample.SimpleAgent is running...");
