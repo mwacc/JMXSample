@@ -4,8 +4,14 @@ import javax.management.*;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class JMXConsole {
 
@@ -38,7 +44,7 @@ public class JMXConsole {
 
     }
 
-    /** ObjectName attributeName [new_value_if_set] host port
+    /** ObjectName attributeName [new_value_if_set] [host port ...]
      * i.e.
      * read all attributes: java jmxsample.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed,CurrentSpeed localhost 1617
      * set new MaxSpeed: java jmxsample.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed i250 localhost 1617
@@ -46,10 +52,17 @@ public class JMXConsole {
     public static void main(String argv[])
             throws Exception {
         JMXConsole console = new JMXConsole();
-        if(argv.length == 4) {
-            console.run(false, argv[0], argv[1], null, argv[2], Integer.parseInt(argv[3]));
-        } else if(argv.length == 5) {
-            console.run(true, argv[0], argv[1], argv[2], argv[3], Integer.parseInt(argv[4]));
+
+        if(argv.length == 1)
+            argv = console.readFromFile(argv[0]);
+
+        for(int i = argv.length % 2 == 0 ? 2 : 3; i < argv.length; i += 2) {
+            try {
+                console.run(argv.length % 2 == 1, argv[0], argv[1],
+                    argv.length % 2 == 1 ? argv[2] : null, argv[i], Integer.parseInt(argv[i+1]));
+            } catch (Exception e) {
+                System.err.println(String.format("Can't perform operation on %s:%s", argv[i], argv[i + 1]));
+            }
         }
     }
 
@@ -72,5 +85,17 @@ public class JMXConsole {
             default:
                 throw new IllegalArgumentException(v);
         }
+    }
+
+    private String[] readFromFile(String pathToFile) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(pathToFile));
+        List<String> list = new ArrayList<String>();
+        String line = null;
+        while ((line = br.readLine()) != null) {
+            list.addAll(Arrays.asList(line.split("\\s") ) );
+        }
+        br.close();
+
+        return list.toArray(new String[list.size()]);
     }
 }
