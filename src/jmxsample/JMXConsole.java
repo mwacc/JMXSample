@@ -32,7 +32,7 @@ public class JMXConsole {
             } else {
                 for(String s : attributeName.split(",")) {
                     Object v = mbeanConn.getAttribute(new ObjectName(objectName), s);
-                    System.out.println( String.format("[%s:%d] Attribute %s has value %s\n",
+                    System.out.println( String.format("[%s:%d] Attribute %s has value %s",
                             host, port, s, v != null ? v.toString() : "NULL") );
                 }
             }
