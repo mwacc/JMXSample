@@ -1,0 +1,7 @@
+# configuration example for batch JMX operation
+FOO:name=jmxsample.ElectroCar MaxSpeed localhost 1617
+FOO:name=jmxsample.ElectroCar CurrentSpeed localhost 1617
+FOO:name=jmxsample.ElectroCar MaxSpeed i250 localhost 1617
+FOO:name=jmxsample.ElectroCar MaxSpeed localhost 1617
+FOO:name=jmxsample.ElectroCar CurrentSpeed localhost 1617
+FOO:name=jmxsample.ElectroCar CurrentSpeed localhost 1617
