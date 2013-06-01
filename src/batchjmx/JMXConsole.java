@@ -1,15 +1,13 @@
-package jmxsample;
+package batchjmx;
 
 import javax.management.*;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -63,7 +61,7 @@ public class JMXConsole {
             try {
                 console.run(arguments.length % 2 == 1, arguments[0], arguments[1],
                         arguments.length % 2 == 1 ? arguments[2] : null,
-                        arguments[arguments.length-2], Integer.parseInt(arguments[arguments.length-1]));
+                        arguments[arguments.length - 2], Integer.parseInt(arguments[arguments.length - 1]));
             } catch (Exception e) {
                 System.err.println(String.format("Can't perform command %s\n",
                         command));
@@ -97,8 +95,8 @@ public class JMXConsole {
      * One list is a completed JMX command:
      * ObjectName attributeName [new_value_if_set] [host port ...]
      * i.e.
-     * read all attributes: java jmxsample.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed,CurrentSpeed localhost 1617
-     * set new MaxSpeed: java jmxsample.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed i250 localhost 1617
+     * read all attributes: java batchjmx.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed,CurrentSpeed localhost 1617
+     * set new MaxSpeed: java batchjmx.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed i250 localhost 1617
      */
     private List<String> readFromFile(String pathToFile) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(pathToFile));
