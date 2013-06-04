@@ -93,7 +93,7 @@ public class JMXConsole {
 
     /**
      * One list is a completed JMX command:
-     * ObjectName attributeName [new_value_if_set] [host port ...]
+     * ObjectName attributeName [new_value_if_set] host port
      * i.e.
      * read all attributes: java batchjmx.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed,CurrentSpeed localhost 1617
      * set new MaxSpeed: java batchjmx.JMXConsole FOO:name=jmxsample.ElectroCar MaxSpeed i250 localhost 1617
