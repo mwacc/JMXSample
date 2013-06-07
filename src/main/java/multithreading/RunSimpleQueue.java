@@ -1,11 +1,15 @@
 package multithreading;
 
 
+import com.higherfrequencytrading.affinity.impl.NativeAffinity;
 import multithreading.impl.RunSimpleQueueAffinity;
 import multithreading.impl.RunSimpleQueueTraditional;
 
 import javax.management.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.net.URL;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -15,7 +19,7 @@ public abstract class RunSimpleQueue implements RunSimpleQueueMBean {
     protected volatile long counter = 0;
     protected volatile boolean stopThread = false;
 
-    public static void main(String[] argv) throws MalformedObjectNameException, NotCompliantMBeanException, InstanceAlreadyExistsException, MBeanRegistrationException {
+    public static void main(String[] argv) throws MalformedObjectNameException, NotCompliantMBeanException, InstanceAlreadyExistsException, MBeanRegistrationException, IOException {
         // Get the platform MBeanServer
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
@@ -25,6 +29,12 @@ public abstract class RunSimpleQueue implements RunSimpleQueueMBean {
         mbs.registerMBean((RunSimpleQueueMBean)t, new ObjectName("FOO:name=multithreading.RunSimpleQueue"));
 
         t.startExample();
+
+        /*InputStream is = NativeAffinity.class.getResource("/").openStream();
+        java.util.Scanner s = new java.util.Scanner(is);
+        while (s.hasNext()) {
+            System.out.println(s.next());
+        } */
     }
 
     private void startExample() {
